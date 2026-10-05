@@ -1,0 +1,28 @@
+services:
+  # Production build:  docker compose up --build
+  web:
+    build:
+      context: .
+      target: runner
+    image: portfolio:latest
+    container_name: portfolio-web
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  # Hot-reload dev server:  docker compose --profile dev up --build dev
+  dev:
+    profiles: ["dev"]
+    build:
+      context: .
+      target: dev
+    container_name: portfolio-dev
+    ports:
+      - "3000:3000"
+    environment:
+      # Needed so file-watching works on Windows/macOS bind mounts.
+      WATCHPACK_POLLING: "true"
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next

@@ -1,0 +1,339 @@
+@import "tailwindcss";
+
+:root {
+  --background: #0a0f0f;
+  --foreground: #ededed;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-mono: var(--font-jetbrains-mono), ui-monospace, "Cascadia Code",
+    "Source Code Pro", Menlo, monospace;
+}
+
+html,
+body {
+  background: var(--background);
+  color: var(--foreground);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  font-family: var(--font-mono);
+}
+
+/* ------------------------------------------------------------------ */
+/* Motion system                                                       */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --ease-out: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+/* Scroll-reveal (Reveal component drives data-reveal / data-variant). */
+[data-reveal="hidden"] {
+  opacity: 0;
+  transform: translateY(16px);
+}
+[data-reveal="hidden"][data-variant="scale"] {
+  transform: translateY(28px) scale(0.97);
+}
+[data-reveal="hidden"][data-variant="mask"] {
+  transform: translateY(28px);
+  clip-path: inset(0 0 100% 0);
+}
+[data-reveal="shown"] {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 700ms var(--ease-out) var(--reveal-delay, 0ms),
+    transform 800ms var(--ease-out) var(--reveal-delay, 0ms),
+    clip-path 900ms var(--ease-out) var(--reveal-delay, 0ms);
+}
+[data-reveal="shown"][data-variant="mask"] {
+  clip-path: inset(-10% -2% -10% -2%);
+}
+
+/* Top scroll-progress bar. */
+.scroll-progress {
+  position: fixed;
+  inset: 0 0 auto 0;
+  z-index: 60;
+  height: 2px;
+  background: linear-gradient(90deg, #7a00ff, #5b7cfa, #2dff9a);
+  transform-origin: 0 50%;
+  transform: scaleX(var(--progress, 0));
+  pointer-events: none;
+}
+
+/* Cursor spotlight (desktop, fine pointers only; JS toggles opacity). */
+.cursor-glow {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1;
+  width: 520px;
+  height: 520px;
+  border-radius: 9999px;
+  background: radial-gradient(
+    circle,
+    rgba(122, 0, 255, 0.16) 0%,
+    rgba(91, 124, 250, 0.07) 40%,
+    transparent 70%
+  );
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 400ms ease;
+  pointer-events: none;
+  will-change: transform;
+}
+@media (hover: none), (pointer: coarse) {
+  .cursor-glow {
+    display: none;
+  }
+}
+
+/* Hero: kinetic title, staggered entrance, drifting orbs, parallax. */
+.split .word {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.14em;
+  margin-bottom: -0.14em;
+}
+.split .char {
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(115%) rotate(7deg);
+}
+html[data-intro="done"] .split .char {
+  animation: char-rise 950ms var(--ease-out) both;
+  animation-delay: calc(var(--base, 0ms) + var(--i, 0) * 38ms);
+}
+@keyframes char-rise {
+  from {
+    opacity: 0;
+    transform: translateY(115%) rotate(7deg);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+.hero-anim {
+  opacity: 0;
+  transform: translateY(18px);
+}
+html[data-intro="done"] .hero-anim {
+  animation: hero-in 850ms var(--ease-out) both;
+  animation-delay: var(--d, 0ms);
+}
+@keyframes hero-in {
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Nav drops in after the intro. "backwards" so it never pins its transform. */
+html[data-intro="done"] .nav-in {
+  animation: nav-in 700ms var(--ease-out) 300ms backwards;
+}
+@keyframes nav-in {
+  from {
+    opacity: 0;
+    transform: translateY(-100%);
+  }
+}
+
+.hero-parallax {
+  transform: translateY(calc(var(--sy, 0) * -0.14px));
+  opacity: calc(1 - var(--sy, 0) / 700);
+  will-change: transform, opacity;
+}
+.hero-bg {
+  transform: translateY(calc(var(--sy, 0) * 0.28px));
+}
+.hero-grid {
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+  background-size: 66px 66px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 100%);
+  -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, black 30%, transparent 100%);
+}
+.orb {
+  position: absolute;
+  border-radius: 9999px;
+  will-change: transform;
+}
+.orb-violet {
+  left: 8%;
+  top: 14%;
+  width: 46vmax;
+  height: 46vmax;
+  background: radial-gradient(circle, rgba(122, 0, 255, 0.3), transparent 62%);
+  animation: drift-a 22s ease-in-out infinite alternate;
+}
+.orb-blue {
+  right: -6%;
+  top: 30%;
+  width: 40vmax;
+  height: 40vmax;
+  background: radial-gradient(circle, rgba(91, 124, 250, 0.22), transparent 62%);
+  animation: drift-b 26s ease-in-out infinite alternate;
+}
+.orb-green {
+  left: 38%;
+  bottom: -18%;
+  width: 34vmax;
+  height: 34vmax;
+  background: radial-gradient(circle, rgba(45, 255, 154, 0.12), transparent 62%);
+  animation: drift-a 30s ease-in-out infinite alternate-reverse;
+}
+@keyframes drift-a {
+  to {
+    transform: translate3d(8vmax, 5vmax, 0) scale(1.12);
+  }
+}
+@keyframes drift-b {
+  to {
+    transform: translate3d(-9vmax, -4vmax, 0) scale(1.08);
+  }
+}
+
+.scroll-cue {
+  position: relative;
+  display: block;
+  width: 1px;
+  height: 36px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.15);
+}
+.scroll-cue::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #2dff9a;
+  animation: cue 1.8s ease-in-out infinite;
+}
+@keyframes cue {
+  0% {
+    transform: translateY(-100%);
+  }
+  60%,
+  100% {
+    transform: translateY(100%);
+  }
+}
+
+/* Tech marquee. */
+.marquee {
+  overflow: hidden;
+  mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+  -webkit-mask-image: linear-gradient(to right, transparent, black 12%, black 88%, transparent);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 38s linear infinite;
+}
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+.marquee-row {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  gap: 2rem;
+  padding-right: 2rem;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.28em;
+  color: rgba(255, 255, 255, 0.5);
+}
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Spotlight + tilt cards. */
+.spot {
+  position: relative;
+  transform: perspective(900px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+  transition:
+    transform 250ms var(--ease-out),
+    border-color 200ms ease;
+}
+.spot::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 300ms ease;
+  background: radial-gradient(
+    280px circle at var(--mx, 50%) var(--my, 50%),
+    rgba(122, 0, 255, 0.22),
+    transparent 70%
+  );
+}
+.spot:hover::before {
+  opacity: 1;
+}
+
+.magnetic {
+  transition: transform 220ms var(--ease-out);
+}
+
+/* Scroll-filled paragraph: dim until lit by ScrollFill. */
+.scroll-fill[data-fill="on"] .sw {
+  opacity: 0.22;
+  transition: opacity 350ms ease;
+}
+.scroll-fill[data-fill="on"] .sw.lit {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-spin {
+    animation: none;
+  }
+
+  /* Show everything in its final state; no movement. */
+  .hero-anim,
+  .split .char {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .orb,
+  .marquee-track,
+  .scroll-cue::after,
+  html[data-intro="done"] .nav-in {
+    animation: none !important;
+  }
+  .hero-parallax,
+  .hero-bg {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+  .spot {
+    transform: none !important;
+  }
+}
